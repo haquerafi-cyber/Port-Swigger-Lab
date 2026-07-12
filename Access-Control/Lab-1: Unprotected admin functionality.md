@@ -1,22 +1,67 @@
-### Vulnerability: This lab has an unprotected admin panel.
+# robots.txt Information Disclosure
 
-### Goal: Solve the lab by deleting the user `carlos`.
+## উদ্দেশ্য
 
-In this challenge, we can check what is allowed and disallowed by accessing the robots.txt file through the URL. The admin panel is marked as disallowed there, but if we manually enter the 
-`/administrator-panel` URL, we can still access it. This is the vulnerability of the site. After that, we can log in as an admin and delete a user to solve the lab.
+`robots.txt` ফাইল থেকে লুকানো বা Sensitive Directory-এর Path বের করে সরাসরি Access করা।
 
-https://…./robots.txt
+---
+
+## পূর্বশর্ত
+
+- `robots.txt` Publicly Accessible হতে হবে।
+- সেখানে Sensitive Path উল্লেখ থাকতে হবে।
+- সেই Path Access Control দ্বারা সুরক্ষিত থাকবে না।
+
+---
+
+## আক্রমণের ধাপ
+
+### ১. `robots.txt` দেখুন
+
+```
+GET /robots.txt
+```
+
+উদাহরণ:
 
 ```
 User-agent: *
 Disallow: /administrator-panel
 ```
 
-From this:
+---
 
-User-agent: *
-Disallow: /administrator-panel
+### ২. প্রকাশিত Path Access করুন
 
-We can understand that the /administrator-panel path is disallowed. However, if we enter /administrator-panel in the URL, we can still log in as an admin and gain admin access.
+```
+GET /administrator-panel
+```
 
-### Conclusion: **By changing or guessing the URL, we can still gain access to the web application.**
+---
+
+### ৩. Admin Function ব্যবহার করুন
+
+যদি Access পাওয়া যায়, তাহলে Admin Panel-এর কার্যক্রম (যেমন User Management) ব্যবহার করা সম্ভব।
+
+---
+
+## কেন এটি কাজ করে
+
+`robots.txt` শুধু Search Engine-কে কোন Path Crawl না করতে বলে। এটি কোনো Access Control নয়। তাই যে কেউ ফাইলটি পড়ে উল্লেখিত Path-এ সরাসরি যেতে পারে।
+
+---
+
+## Impact
+
+- Hidden Directory Disclosure
+- Admin Panel Exposure
+- Sensitive Function Access
+- তথ্য ফাঁস বা Account Management-এর ঝুঁকি
+
+---
+
+## Mitigation
+
+- `robots.txt`এ Sensitive Path প্রকাশ করা যাবে না।
+- Admin Panel-এর জন্য Authentication ও Authorization বাধ্যতামূলক করতে হবে।
+- Sensitive Resource শুধুমাত্র Access Control দিয়ে সুরক্ষিত রাখতে হবে।
